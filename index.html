@@ -315,15 +315,8 @@ button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
   #snd-btn svg { width: 12px; height: 12px; }
   #sound-hint { top: 23px; right: 64px; font-size: 8.5px; }
 
-  /* Nav dots: smaller visuals, larger tap targets via padding */
-  #nav-dots { right: 12px; gap: 10px; }
-  .nd {
-    width: 3px; height: 3px;
-    padding: 10px;                 /* 23×23px tap area */
-    background-clip: content-box;  /* colour only fills the 3px core */
-    box-sizing: content-box;
-  }
-  .nd.on { transform: scale(2.2); }
+  /* Nav dots: hidden on mobile — swipe is the interaction */
+  #nav-dots { display: none; }
 
   /* Scroll cue */
   .scroll-cue { bottom: calc(var(--wave-h) + 20px); font-size: 8.5px; }
@@ -350,7 +343,7 @@ button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
   #snd-btn     { top: 8px; right: 12px; width: 30px; height: 30px; }
   #snd-btn svg { width: 11px; height: 11px; }
   #sound-hint  { top: 10px; right: 54px; font-size: 8px; }
-  #nav-dots    { right: 10px; gap: 8px; }
+  #nav-dots    { display: none; }
 
   .logo-wrap svg { width: 32px; height: 44px; }
   .logo-ion      { font-size: 24px; }
@@ -482,6 +475,8 @@ button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
   var ctx    = canvas.getContext('2d');
   var W = 0, H = 0;
   var worldW, worldD, focalLen, camY, hY, wAmp;
+  var COLS = 310;
+  var ROWS = 105;
 
   function resize() {
     var dpr  = window.devicePixelRatio || 1;
@@ -494,13 +489,15 @@ button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
     worldD   = focalLen * 2.8;
     worldW   = W * 1.15;
     wAmp     = H * 0.10;
+    // Scale grid density to CSS screen size so dots never merge into lines.
+    // Target ~4 CSS px between dot centres on any device.
+    var cssW = rect.width;
+    var cssH = rect.height;
+    COLS = Math.max(50,  Math.min(310, Math.round(cssW / 4)));
+    ROWS = Math.max(30,  Math.min(105, Math.round(cssH / 5)));
   }
   resize();
   window.addEventListener('resize', function () { resize(); if (!running) drawFrame(); });
-
-  // Dense grid — same column count every row; perspective handles compression.
-  var COLS = 310;
-  var ROWS = 105;
 
   // Faraday band amplitudes — driven by time, not audio.
   // Each band oscillates at a different rate so the four standing-wave
