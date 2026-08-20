@@ -323,7 +323,8 @@ button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
   /* Content widths: let text fill the screen */
   h1.hdl { max-width: 100%; font-size: clamp(24px, 7vw, 36px); }
-  .txt   { max-width: 100%; font-size: clamp(15px, 4vw, 17px); }
+  .txt   { max-width: 100%; font-size: clamp(14px, 3.8vw, 16px); line-height: 1.5; }
+  .txt p + p { margin-top: .8em; }
   .qte   { max-width: 100%; font-size: clamp(15px, 4vw, 18px); }
 
   /* Footer: wrap gracefully */
@@ -490,11 +491,11 @@ button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
     worldW   = W * 1.15;
     wAmp     = H * 0.10;
     // Scale grid density to CSS screen size so dots never merge into lines.
-    // Target ~4 CSS px between dot centres on any device.
+    // Divisor controls spacing: smaller = denser. 3/4 gives visible dots on mobile.
     var cssW = rect.width;
     var cssH = rect.height;
-    COLS = Math.max(50,  Math.min(310, Math.round(cssW / 4)));
-    ROWS = Math.max(30,  Math.min(105, Math.round(cssH / 5)));
+    COLS = Math.max(60,  Math.min(310, Math.round(cssW / 3)));
+    ROWS = Math.max(35,  Math.min(105, Math.round(cssH / 4)));
   }
   resize();
   window.addEventListener('resize', function () { resize(); if (!running) drawFrame(); });
