@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ION — Planetary Token</title>
+<style>
+
+/* ── FONTS ──────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Oscine';
+  src: url('web/oscine_lt-webfont.woff2') format('woff2'),
+       url('web/oscine_lt-webfont.woff') format('woff');
+  font-weight: 300; font-style: normal;
+}
+@font-face {
+  font-family: 'Oscine';
+  src: url('web/oscine_rg-webfont.woff2') format('woff2'),
+       url('web/oscine_rg-webfont.woff') format('woff');
+  font-weight: 400; font-style: normal;
+}
+@font-face {
+  font-family: 'Oscine';
+  src: url('web/oscine_it-webfont.woff2') format('woff2'),
+       url('web/oscine_it-webfont.woff') format('woff');
+  font-weight: 400; font-style: italic;
+}
+@font-face {
+  font-family: 'Oscine';
+  src: url('web/oscine_bd-webfont.woff2') format('woff2'),
+       url('web/oscine_bd-webfont.woff') format('woff');
+  font-weight: 700; font-style: normal;
+}
+@font-face {
+  font-family: 'Oscine';
+  src: url('web/oscine_xbd-webfont.woff2') format('woff2'),
+       url('web/oscine_xbd-webfont.woff') format('woff');
+  font-weight: 800; font-style: normal;
+}
+
+/* ── RESET ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --bg:     #F8F8F6;
+  --ink:    #111110;
+  --mid:    #747470;
+  --faint:  #E0E0DC;
+  --wave-h: 32vh;
+  --pad:    clamp(20px, 6vw, 80px);
+}
+
+/* ── BASE ── no page scroll at all ─────────────────────── */
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+}
+body {
+  font-family: 'Oscine', 'Helvetica Neue', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── WAVE CANVAS ────────────────────────────────────────── */
+#wave-canvas {
+  position: fixed;
+  bottom: 0; left: 0;
+  width: 100%; height: var(--wave-h);
+  pointer-events: none;
+  z-index: 20;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 22%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 22%);
+}
+
+/* ── SLIDES ──────────────────────────────────────────────────────── */
+/* All slides stacked full-screen. Content centred. */
+.slide {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;       /* centre blocks horizontally */
+  text-align: left;
+  padding: 80px var(--pad) calc(var(--wave-h) + 24px) var(--pad);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .65s ease, visibility 0s .65s;
+  pointer-events: none;
+  z-index: 5;
+}
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .65s ease, visibility 0s 0s;
+  pointer-events: auto;
+}
+
+/* ── SPLASH ──────────────────────────────────────────────────────── */
+.logo-wrap {
+  display: flex; align-items: center; gap: 20px;
+}
+.logo-wrap svg { width: 66px; height: 90px; flex-shrink: 0; display: block; }
+.logo-ion      { font-size: 42px; font-weight: 700; letter-spacing: .02em; line-height: 1; text-align: left; }
+.logo-tag      { font-size: 18px; font-weight: 300; letter-spacing: .01em; margin-top: 4px; text-align: left; }
+
+/* Scroll cue — centred, device-aware text via CSS */
+.scroll-cue {
+  position: absolute;
+  bottom: calc(var(--wave-h) + 36px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px;
+  font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--mid);
+  white-space: nowrap;
+  opacity: 0;
+  animation: fadein .7s ease forwards 1.6s;
+}
+.cue-line {
+  display: inline-block;
+  width: 26px; height: 1px; background: var(--mid);
+  transform-origin: left; transform: scaleX(0);
+  animation: grow .5s ease forwards 2s;
+}
+/* Default: mouse / trackpad */
+.cue-text::after  { content: 'Scroll or click to explore'; }
+/* Touch device */
+@media (pointer: coarse) {
+  .cue-text::after { content: 'Scroll or tap to explore'; }
+}
+
+/* ── SECTION CONTENT ──────────────────────────────────────────── */
+.lbl {
+  font-size: 9.5px; font-weight: 400;
+  letter-spacing: .23em; text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 22px;
+}
+h1.hdl {
+  font-size: clamp(28px, 3.8vw, 54px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -.025em;
+  max-width: 560px;
+  text-align: center;
+}
+.txt {
+  font-size: clamp(15.5px, 1.3vw, 18px);
+  font-weight: 300;
+  line-height: 1.74;
+  max-width: 560px;
+  color: #2B2B29;
+}
+.txt p + p { margin-top: 1.1em; }
+
+/* ── CLOSING ──────────────────────────────────────────────────────── */
+#closing { /* inherits centred from .slide */ }
+
+.qte {
+  font-size: clamp(16px, 1.85vw, 23px);
+  font-weight: 400; font-style: italic;
+  line-height: 1.68;
+  max-width: 640px;
+  text-align: center;
+}
+.foot {
+  margin-top: 48px;
+  font-size: 11.5px; letter-spacing: .1em;
+  color: var(--mid);
+  display: flex; align-items: center; gap: 18px;
+}
+.foot a         { color: var(--mid); text-decoration: none; transition: color .2s; }
+.foot a:hover   { color: var(--ink); }
+.foot-sep       { color: var(--faint); }
+
+/* ── FIXED SECTION LABEL ────────────────────────────────── */
+#slide-label {
+  position: fixed;
+  top: 56px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  font-size: 9.5px;
+  font-weight: 400;
+  letter-spacing: .23em;
+  text-transform: uppercase;
+  color: var(--mid);
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity .25s ease;
+}
+
+/* ── SOUND HINT (splash slide only) ─────────────────────── */
+#sound-hint {
+  position: fixed;
+  top: 33px;         /* vertically centred on the 38px button at top:26px */
+  right: 78px;       /* 26 margin + 38 button + 14 gap */
+  z-index: 199;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 9.5px; letter-spacing: .20em; text-transform: uppercase;
+  color: var(--mid);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .5s ease;
+  pointer-events: none;
+}
+#sound-hint.show { opacity: 1; }
+.sh-line {
+  display: inline-block;
+  width: 18px; height: 1px;
+  background: currentColor; flex-shrink: 0;
+}
+
+/* ── SOUND BUTTON ───────────────────────────────────────── */
+#snd-btn {
+  position: fixed;
+  top: 26px; right: 26px;
+  z-index: 200;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--faint);
+  background: var(--bg);
+  color: var(--ink);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .2s, background .2s, color .2s;
+  padding: 0;
+}
+#snd-btn:hover   { border-color: var(--ink); }
+#snd-btn.playing { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+#snd-btn svg     { width: 14px; height: 14px; display: block; }
+
+/* Pulsing ring shown while sound hasn’t been started yet */
+#snd-btn.prompt::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid var(--mid);
+  animation: pulse-ring 1.8s ease-out infinite;
+  pointer-events: none;
+}
+
+/* ── NAV DOTS ───────────────────────────────────────────── */
+#nav-dots {
+  position: fixed;
+  right: 29px; top: 50%;
+  transform: translateY(-50%);
+  z-index: 200;
+  display: flex; flex-direction: column; gap: 9px;
+}
+.nd {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--faint);
+  border: none; padding: 0;
+  cursor: pointer;
+  transition: background .25s, transform .25s;
+}
+.nd.on { background: var(--ink); transform: scale(1.8); }
+
+/* ── KEYFRAMES ──────────────────────────────────────────── */
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes pulse-ring {
+  0%   { transform: scale(1);   opacity: .5; }
+  100% { transform: scale(1.9); opacity: 0;  }
+}
+
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* ── TABLET (≤ 1024px) ──────────────────────────────────── */
+@media (max-width: 1024px) {
+  :root { --pad: max(32px, 5vw); }
+}
+
+/* ── MOBILE PORTRAIT (≤ 600px) ─────────────────────────── */
+@media (max-width: 600px) {
+  :root {
+    --wave-h: 28vh;
+    --pad: 24px;
+  }
+
+  /* Slide padding: less top, wave gap already handled by --wave-h */
+  .slide { padding-top: 64px; }
+
+  /* Logo: compact */
+  .logo-wrap     { gap: 14px; }
+  .logo-wrap svg { width: 46px; height: 62px; }
+  .logo-ion      { font-size: 30px; }
+  .logo-tag      { font-size: 14px; margin-top: 2px; }
+
+  /* Label: sit just below status bar zone */
+  #slide-label { top: 42px; }
+
+  /* Sound button: tighter corner */
+  #snd-btn { top: 16px; right: 16px; width: 34px; height: 34px; }
+  #snd-btn svg { width: 12px; height: 12px; }
+  #sound-hint { top: 23px; right: 64px; font-size: 8.5px; }
+
+  /* Nav dots: smaller visuals, larger tap targets via padding */
+  #nav-dots { right: 12px; gap: 10px; }
+  .nd {
+    width: 3px; height: 3px;
+    padding: 10px;                 /* 23×23px tap area */
+    background-clip: content-box;  /* colour only fills the 3px core */
+    box-sizing: content-box;
+  }
+  .nd.on { transform: scale(2.2); }
+
+  /* Scroll cue */
+  .scroll-cue { bottom: calc(var(--wave-h) + 20px); font-size: 8.5px; }
+
+  /* Content widths: let text fill the screen */
+  h1.hdl { max-width: 100%; font-size: clamp(24px, 7vw, 36px); }
+  .txt   { max-width: 100%; font-size: clamp(15px, 4vw, 17px); }
+  .qte   { max-width: 100%; font-size: clamp(15px, 4vw, 18px); }
+
+  /* Footer: wrap gracefully */
+  .foot { flex-wrap: wrap; gap: 10px; margin-top: 28px; font-size: 11px; }
+}
+
+/* ── LANDSCAPE / SHORT SCREENS (≤ 500px tall) ───────────── */
+@media (max-height: 500px) {
+  :root { --wave-h: 22vh; }
+
+  .slide {
+    padding-top: 40px;
+    padding-bottom: calc(var(--wave-h) + 12px);
+  }
+
+  #slide-label { top: 12px; }
+  #snd-btn     { top: 8px; right: 12px; width: 30px; height: 30px; }
+  #snd-btn svg { width: 11px; height: 11px; }
+  #sound-hint  { top: 10px; right: 54px; font-size: 8px; }
+  #nav-dots    { right: 10px; gap: 8px; }
+
+  .logo-wrap svg { width: 32px; height: 44px; }
+  .logo-ion      { font-size: 24px; }
+  .logo-tag      { font-size: 12px; }
+
+  h1.hdl { font-size: clamp(20px, 4vh, 32px); }
+  .txt   { font-size: clamp(13px, 2.5vh, 16px); line-height: 1.55; }
+  .txt p + p { margin-top: .7em; }
+
+  .scroll-cue { bottom: calc(var(--wave-h) + 10px); }
+  .foot       { margin-top: 14px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- WAVE -->
+<canvas id="wave-canvas" aria-hidden="true"></canvas>
+
+<!-- no <audio> element needed — loaded via XHR into AudioBuffer for gapless loop -->
+
+<!-- SOUND BUTTON -->
+<button id="snd-btn" aria-label="Toggle sound" title="Sound">
+  <svg id="ico-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+       fill="none" stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+    <line x1="23" y1="9" x2="17" y2="15"/>
+    <line x1="17" y1="9" x2="23" y2="15"/>
+  </svg>
+  <svg id="ico-on" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+       fill="none" stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+  </svg>
+</button>
+
+<!-- SOUND HINT -->
+<div id="sound-hint" aria-hidden="true">
+  <span class="sh-line"></span>Turn on sound
+</div>
+
+<!-- NAV DOTS -->
+<nav id="nav-dots" aria-label="Slide navigation"></nav>
+
+<!-- FIXED SECTION LABEL — always same position, text updated by JS -->
+<div id="slide-label"></div>
+
+<!-- ══════════════════════════════════════════
+     SLIDES — all fixed, stacked, fade in/out
+══════════════════════════════════════════ -->
+
+<!-- 0: Splash -->
+<section id="splash" class="slide">
+  <div class="logo-wrap">
+    <svg viewBox="0 0 66 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="33" y1="0" x2="33" y2="90" stroke="#111110" stroke-width="2.2"/>
+      <circle cx="33" cy="45" r="30" stroke="#111110" stroke-width="2.2"/>
+    </svg>
+    <div>
+      <div class="logo-ion">ION</div>
+      <div class="logo-tag">planetary token</div>
+    </div>
+  </div>
+  <div class="scroll-cue">
+    <span class="cue-line"></span>
+    <span class="cue-text"></span>
+  </div>
+</section>
+
+<!-- 1: How -->
+<section class="slide">
+  <h1 class="hdl">ION and The Works will<br>transform the flow of money.</h1>
+</section>
+
+<!-- 2: The Problem -->
+<section class="slide">
+  <div class="txt">
+    <p>Money is a system for directing economic activity. Banks create money used by companies through credit. Companies use that capital to grow and generate returns for shareholders.</p>
+    <p>This creates a structural problem. Financial return can be measured directly, while the impact on nature often cannot. Capital flows towards activities that create financial value while damaging biodiversity, resources, soil, water and human wellbeing.</p>
+  </div>
+</section>
+
+<!-- 3: The Answer -->
+<section class="slide">
+  <div class="txt">
+    <p>The answer is to change where money flows. This is where ION comes in.</p>
+    <p>ION can best be perceived as a bank account within the Nature Banking principle. It allows capital to grow according to a natural growth curve while supporting human wellbeing, nature and beyond through direct investment in the products and services of The Works.</p>
+    <p>The Works develops technologies, products and services that are fully aligned with human wellbeing, nature and beyond. The Works remains focused on research and development and works with aligned production and distribution partners to bring its innovations into the world.</p>
+    <p>The returns generated by these activities flow back to the ION holder, further product development and the guardians of nature. In this way, capital does not simply seek financial return. It flows forward on behalf of future generations.</p>
+  </div>
+</section>
+
+<!-- 4: ION vs Bank -->
+<section class="slide">
+  <div class="txt">
+    <p>An ION account can exist perfectly well next to a regular bank account. They serve different purposes. A regular bank account connects you to the conventional economy, where capital can support activities with negative effects on human wellbeing, nature and beyond. An ION account connects you to an economy designed to create positive effects.</p>
+  </div>
+</section>
+
+<!-- 5: Natural Use -->
+<section class="slide">
+  <div class="txt">
+    <p>The most natural use of ION is for the part of your capital that can be patient. Instead of needing that capital to remain immediately available, it can be placed on an ION account and allowed to grow according to its natural growth curve while supporting human wellbeing, nature and beyond.</p>
+  </div>
+</section>
+
+<!-- 6: Closing -->
+<section id="closing" class="slide">
+  <p class="qte">In this system, ION carries the financial flow. The Works develops what comes next. Production and distribution partners bring innovations into the world. The returns flow back into the system, allowing capital to keep moving forward.</p>
+  <div class="foot">
+    <a href="https://www.ION.fund" target="_blank" rel="noopener">www.ION.fund</a>
+    <span class="foot-sep">·</span>
+    <a href="https://www.theworks.info" target="_blank" rel="noopener">www.theworks.info</a>
+  </div>
+</section>
+
+<script>
+/* ════════════════════════════════════════════════
+   WAVE — dense 3D grid + Faraday standing-wave modes
+   Modes are driven by 4 live audio frequency bands.
+   When sound is off the surface is static.
+════════════════════════════════════════════════ */
+;(function () {
+  var canvas = document.getElementById('wave-canvas');
+  var ctx    = canvas.getContext('2d');
+  var W = 0, H = 0;
+  var worldW, worldD, focalLen, camY, hY, wAmp;
+
+  function resize() {
+    var dpr  = window.devicePixelRatio || 1;
+    var rect = canvas.getBoundingClientRect();
+    W = canvas.width  = rect.width  * dpr;
+    H = canvas.height = rect.height * dpr;
+    hY       = H * 0.055;
+    camY     = H - hY;
+    focalLen = H * 0.82;
+    worldD   = focalLen * 2.8;
+    worldW   = W * 1.15;
+    wAmp     = H * 0.10;
+  }
+  resize();
+  window.addEventListener('resize', function () { resize(); if (!running) drawFrame(); });
+
+  // Dense grid — same column count every row; perspective handles compression.
+  var COLS = 310;
+  var ROWS = 105;
+
+  // Faraday band amplitudes — driven by time, not audio.
+  // Each band oscillates at a different rate so the four standing-wave
+  // modes naturally phase in and out, producing ever-changing patterns.
+  var bands = [0, 0, 0, 0];
+
+  function updateBands(t) {
+    bands[0] = 0.48 + 0.30 * Math.sin(t * 0.27);
+    bands[1] = 0.40 + 0.28 * Math.sin(t * 0.43 + 1.6);
+    bands[2] = 0.32 + 0.22 * Math.cos(t * 0.61 + 3.1);
+    bands[3] = 0.20 + 0.15 * Math.sin(t * 0.89 + 0.8);
+  }
+
+  // Faraday standing-wave surface
+  // Base slow wave gives a beautiful frozen shape when paused.
+  // Modes 1-4 are driven by audio bands and create standing-wave patterns.
+  function wShape(wx, wz, t) {
+    var kx = Math.PI * 3.2 / worldW;
+    var kz = Math.PI * 9.0 / worldD;
+
+    // Base — gentle travelling wave always present when running
+    var base =
+      Math.sin(wz*kz*1.0  + wx*kx*0.28 + t*0.65) * 0.20 +
+      Math.sin(wz*kz*0.55 - wx*kx*0.52 + t*0.48) * 0.14 +
+      Math.cos(wz*kz*0.38 + wx*kx*0.18 + t*0.60) * 0.08;
+
+    // Spatial base for Faraday modes (scale to world coords)
+    var kF = Math.PI * 5.5 / Math.min(worldW, worldD);
+
+    // Mode 1 — parallel ridges running across Z (driven by sub-bass)
+    var m1 = bands[0] * 0.60 *
+      (Math.cos(kF * 2.2 * wz) + Math.cos(kF * 2.2 * wx) * 0.45) *
+      Math.cos(t * 1.25);
+
+    // Mode 2 — diagonal standing wave, 45° rotated (driven by low-mid)
+    var kD = kF * 3.4 * 0.7071;
+    var m2 = bands[1] * 0.50 *
+      Math.cos(kD * (wx + wz)) *
+      Math.cos(kD * (wx - wz)) *
+      Math.cos(t * 2.15);
+
+    // Mode 3 — hexagonal-ish 3-wave superposition (driven by high-mid)
+    var kH = kF * 5.0;
+    var m3 = bands[2] * 0.38 * (
+      Math.cos(kH * wx) * Math.cos(kH * wz * 0.866) +
+      Math.cos(kH * (wx * 0.5 + wz * 0.866)) * 0.5
+    ) * Math.cos(t * 3.40);
+
+    // Mode 4 — fine ripple, transient high-freq bursts (driven by high)
+    var m4 = bands[3] * 0.28 *
+      Math.sin(kF * 7.5 * wx) * Math.sin(kF * 7.5 * wz) *
+      Math.cos(t * 5.20);
+
+    return base + m1 + m2 + m3 + m4;
+  }
+
+  // Pause/resume time tracking
+  var running  = false;
+  var accum    = 0;
+  var runStart = null;
+  var rafId    = null;
+
+  function currentT() {
+    return accum + (running && runStart ? (performance.now() - runStart) / 1000 : 0);
+  }
+
+  function drawFrame() {
+    var t = currentT();
+    updateBands(t);          // time-driven Faraday amplitudes
+    var dpr = window.devicePixelRatio || 1;
+    ctx.clearRect(0, 0, W, H);
+
+    for (var row = 0; row < ROWS; row++) {
+      var worldZ = (1 - row / (ROWS - 1)) * worldD;
+      var scale  = focalLen / (focalLen + worldZ);
+      var dotR   = Math.max(0.16 * dpr, scale * 0.80 * dpr);
+
+      for (var col = 0; col < COLS; col++) {
+        var waveX  = (col / (COLS - 1) - 0.5) * worldW;  // wave-space X (for wave fn)
+        var wv     = wShape(waveX, worldZ, t);
+        var worldY = wAmp * wv;
+        var sx     = (col / (COLS - 1)) * W;               // full-width: no X perspective
+        var sy     = hY + (camY - worldY) * scale;
+
+        if (sx < -dotR || sx > W + dotR) continue;
+        if (sy < -dotR || sy > H + dotR) continue;
+
+        var bright    = Math.round(8 + ((wv + 1) * 0.5) * 108);
+        var depthFade = Math.min(1, scale * 1.7);
+        var alpha     = Math.max(0, depthFade * 0.88);
+
+        ctx.beginPath();
+        ctx.arc(sx, sy, dotR, 0, 6.2832);
+        ctx.fillStyle = 'rgba(' + bright + ',' + bright + ',' + bright + ',' + alpha + ')';
+        ctx.fill();
+      }
+    }
+
+    if (running) rafId = requestAnimationFrame(drawFrame);
+  }
+
+  // Static frame on load
+  drawFrame();
+
+  window.__ionWaveResume = function () {
+    if (running) return;
+    running  = true;
+    runStart = performance.now();
+    rafId    = requestAnimationFrame(drawFrame);
+  };
+
+  window.__ionWavePause = function () {
+    if (!running) return;
+    accum   += (performance.now() - (runStart || performance.now())) / 1000;
+    runStart = null;
+    running  = false;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  };
+}());
+
+
+/* ════════════════════════════════════════════════
+   AUDIO — plain HTML5, no Web Audio API
+════════════════════════════════════════════════ */
+;(function () {
+  var btn    = document.getElementById('snd-btn');
+  var icoOff = document.getElementById('ico-off');
+  var icoOn  = document.getElementById('ico-on');
+
+  var el = document.createElement('audio');
+  el.src     = 'audio/bubbling.mp3';
+  el.loop    = true;
+  el.preload = 'auto';
+  el.style.display = 'none';
+  document.body.appendChild(el);
+
+  var active = false;
+
+  btn.addEventListener('click', function () {
+    if (active) {
+      el.pause();
+      active = false;
+      icoOn.style.display  = 'none';
+      icoOff.style.display = '';
+      btn.classList.remove('playing');
+      if (window.__ionWavePause) window.__ionWavePause();
+    } else {
+      el.play()
+        .then(function () {
+          active = true;
+          icoOff.style.display = 'none';
+          icoOn.style.display  = '';
+          btn.classList.add('playing');
+          window.__ionSoundStarted = true;
+          btn.classList.remove('prompt');
+          var hint = document.getElementById('sound-hint');
+          if (hint) hint.classList.remove('show');
+          if (window.__ionWaveResume) window.__ionWaveResume();
+        })
+        .catch(function (e) { console.warn('ION audio:', e); });
+    }
+  });
+}());
+
+
+/* ════════════════════════════════════════════════
+   SLIDES — wheel / touch / keyboard navigation
+   No page scroll. Content fades in / out in place.
+════════════════════════════════════════════════ */
+;(function () {
+  var slides   = Array.from(document.querySelectorAll('.slide'));
+  var navEl    = document.getElementById('nav-dots');
+  var labelEl  = document.getElementById('slide-label');
+  var hintEl   = document.getElementById('sound-hint');
+  var sndBtn   = document.getElementById('snd-btn');
+  var cur      = 0;
+  var locked   = false;
+  var LOCK_MS  = 700;
+  var hintTimer = null;
+
+  function setSoundHint(idx) {
+    clearTimeout(hintTimer);
+    if (idx === 0 && !window.__ionSoundStarted) {
+      // Delay so the hint appears after the slide has faded in
+      hintTimer = setTimeout(function () {
+        hintEl.classList.add('show');
+        sndBtn.classList.add('prompt');
+      }, 900);
+    } else {
+      hintEl.classList.remove('show');
+      // Keep .prompt only if still on splash; remove otherwise
+      if (idx !== 0) sndBtn.classList.remove('prompt');
+    }
+  }
+
+  // Label for each slide index. Empty string = no label shown.
+  var LABELS = [
+    '',                               // 0: Splash
+    'How',                            // 1
+    'The Problem',                    // 2
+    'The Answer',                     // 3
+    'ION vs. a Regular Bank Account', // 4
+    'The Most Natural Use of ION',    // 5
+    ''                                // 6: Closing
+  ];
+
+  function updateLabel(idx) {
+    var text = LABELS[idx] || '';
+    // If label text is identical to current, skip animation
+    if (labelEl.textContent === text) return;
+    labelEl.style.opacity = '0';
+    setTimeout(function () {
+      labelEl.textContent = text;
+      labelEl.style.opacity = text ? '1' : '0';
+    }, 200);
+  }
+
+  /* Build nav dots */
+  slides.forEach(function (_, i) {
+    var d = document.createElement('button');
+    d.className = 'nd';
+    d.setAttribute('aria-label', 'Slide ' + (i + 1));
+    d.addEventListener('click', function () { go(i); });
+    navEl.appendChild(d);
+  });
+  var dots = Array.from(navEl.querySelectorAll('.nd'));
+
+  function updateDots() {
+    dots.forEach(function (d, i) { d.classList.toggle('on', i === cur); });
+  }
+
+  function go(idx) {
+    if (locked) return;
+    // Wrap around at both ends
+    if (idx >= slides.length) idx = 0;
+    if (idx < 0) idx = slides.length - 1;
+    if (idx === cur) return;
+
+    locked = true;
+    slides[cur].classList.remove('active');
+    cur = idx;
+    slides[cur].classList.add('active');
+    updateDots();
+    updateLabel(idx);
+    setSoundHint(idx);
+    setTimeout(function () { locked = false; }, LOCK_MS);
+  }
+
+  /* Show first slide */
+  slides[0].classList.add('active');
+  updateDots();
+  updateLabel(0);
+  setSoundHint(0);
+
+  /* ── Click / Tap anywhere to advance ── */
+  document.addEventListener('click', function (e) {
+    // Let buttons (sound, nav dots) and links handle themselves
+    if (e.target.closest('button, a')) return;
+    go(cur + 1);
+  });
+
+  /* ── Wheel ── */
+  window.addEventListener('wheel', function (e) {
+    if (e.deltaY > 20)       go(cur + 1);
+    else if (e.deltaY < -20) go(cur - 1);
+  }, { passive: true });
+
+  /* ── Keyboard ── */
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'PageDown') go(cur + 1);
+    if (e.key === 'ArrowUp'   || e.key === 'ArrowLeft'  || e.key === 'PageUp')   go(cur - 1);
+  });
+
+  /* ── Touch ── */
+  var ty0 = 0;
+  window.addEventListener('touchstart', function (e) {
+    ty0 = e.touches[0].clientY;
+  }, { passive: true });
+  window.addEventListener('touchend', function (e) {
+    var d = ty0 - e.changedTouches[0].clientY;
+    if (d > 40)       go(cur + 1);
+    else if (d < -40) go(cur - 1);
+  }, { passive: true });
+}());
+</script>
+</body>
+</html>

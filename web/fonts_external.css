@@ -1,0 +1,64 @@
+@font-face {
+    font-family: 'oscinebold';
+    src: url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_bd-webfont.woff2') format('woff2'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_bd-webfont.woff') format('woff'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/Oscine_Bd.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'oscinebold_italic';
+    src: url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_bdit-webfont.woff2') format('woff2'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_bdit-webfont.woff') format('woff'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/Oscine_Bdit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'oscineitalic';
+    src: url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_it-webfont.woff2') format('woff2'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_it-webfont.woff') format('woff'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/Oscine_It.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'oscinelight';
+    src: url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_lt-webfont.woff2') format('woff2'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_lt-webfont.woff') format('woff'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/Oscine_Lt.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+font-face {
+    font-family: 'oscinelight_italic';
+    src: url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_ltit-webfont.woff2') format('woff2'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_ltit-webfont.woff') format('woff'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/Oscine_Ltit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'oscineregular';
+    src: url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_rg-webfont.woff2') format('woff2'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_rg-webfont.woff') format('woff'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/Oscine_Rg.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'oscinexbold';
+    src: url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_xbd-webfont.woff2') format('woff2'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_xbd-webfont.woff') format('woff'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/Oscine_XBd.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'oscinexbold_italic';
+    src: url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_xbdit-webfont.woff2') format('woff2'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/oscine_xbdit-webfont.woff') format('woff'),
+        url('https://cdn.doctorit.eu/accounts/origin/fonts/Oscine_XBdit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
