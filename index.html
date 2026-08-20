@@ -83,7 +83,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;       /* centre blocks horizontally */
-  text-align: left;
+  text-align: center;
   padding: 80px var(--pad) calc(var(--wave-h) + 24px) var(--pad);
   opacity: 0;
   visibility: hidden;
@@ -106,10 +106,10 @@ body {
 .logo-ion      { font-size: 42px; font-weight: 700; letter-spacing: .02em; line-height: 1; text-align: left; }
 .logo-tag      { font-size: 18px; font-weight: 300; letter-spacing: .01em; margin-top: 4px; text-align: left; }
 
-/* Scroll cue — centred, device-aware text via CSS */
+/* Scroll cue — fixed at same position as section labels */
 .scroll-cue {
-  position: absolute;
-  bottom: calc(var(--wave-h) + 36px);
+  position: fixed;
+  top: 56px;
   left: 50%;
   transform: translateX(-50%);
   display: flex; align-items: center; gap: 14px;
@@ -153,6 +153,7 @@ h1.hdl {
   line-height: 1.74;
   max-width: 560px;
   color: #2B2B29;
+  margin-top: 8px;
 }
 .txt p + p { margin-top: 1.1em; }
 
@@ -425,7 +426,7 @@ button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
 <!-- 1: How -->
 <section class="slide">
-  <h1 class="hdl">ION and The Works will<br>transform the flow of money.</h1>
+  <h1 class="hdl">ION and The Works will transform the flow of money.</h1>
 </section>
 
 <!-- 2: The Problem -->
